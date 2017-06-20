@@ -16,7 +16,7 @@ def initArgParser():
                       help='Number of variable initializers stddev.')
   parser.add_argument('--val_reg_scale', type=int, default=0.1,
                       help='Number of variable l1 l2 scale.')
-  parser.add_argument('--num_hidden', type=int, default=1,
+  parser.add_argument('--hidden_size', type=int, default=1,
                       help='Number of hidden layers.')
   parser.add_argument('--unit_size', type=int, default=10,
                       help='Number of unit size.')
@@ -40,7 +40,7 @@ def build(inputs, keep_prob):
                   'b': tf.contrib.layers.l2_regularizer(
                         scale=FLAGS.val_reg_scale)}
 
-  if(FLAGS.num_hidden == 1):
+  if(FLAGS.hidden_size == 1):
     outputs = snt.Linear(output_size=1,
                          initializers=initializers,
                          regularizers=regularizers)(inputs)
@@ -51,7 +51,7 @@ def build(inputs, keep_prob):
                        regularizers=regularizers)(inputs)
   outputs = tf.nn.relu(outputs)
   #outputs = tf.nn.dropout(outputs, keep_prob)
-  for _ in range(FLAGS.num_hidden-2):
+  for _ in range(FLAGS.hidden_size-2):
     outputs = snt.Linear(output_size=FLAGS.unit_size,
                          initializers=initializers,
                          regularizers=regularizers)(outputs)
@@ -101,7 +101,7 @@ def train():
     '''Make a TensorFlow feed_dict: maps data onto Tensor placeholders.'''
     if train:
         xs, ys = dataset.fetch_train()
-        k = 0.9
+        k = FLAGS.dropout
     else:
         xs, ys = dataset.fetch_test()
         k = 1.0
